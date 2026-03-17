@@ -4,7 +4,7 @@ namespace App\Application\Query;
 
 final class MovieSearchQuery
 {
-    private function __construct(
+    public function __construct(
         public string $title,
         public bool $includeAdult,
         public ?int $year,
