@@ -38,7 +38,7 @@ class MovieSearchRequest extends FormRequest
         return new MovieSearchQuery(
             $this->string('title'),
             $this->boolean('include_adult') ?: false,
-            $this->integer('year'),
+            $this->integer('year') ?: null,
             $this->integer('page', 1)
         );
     }
