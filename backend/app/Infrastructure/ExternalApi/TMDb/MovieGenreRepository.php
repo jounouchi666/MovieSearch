@@ -19,7 +19,10 @@ class MovieGenreRepository implements MovieGenreRepositoryInterface
     public function getGenre(): array
     {
         $data = $this->tmdbRequestExecutor->executeRequest(
-                config('tmdb.genre_url')
+                config('tmdb.genre_url'),
+                [
+                    'language' => config('tmdb.language')
+                ]
             );
         return collect($data['genres'])->pluck('name', 'id')->toArray();
     }
