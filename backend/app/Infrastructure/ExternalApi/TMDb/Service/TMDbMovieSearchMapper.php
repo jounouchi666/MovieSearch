@@ -24,10 +24,10 @@ class TMDbMovieSearchMapper
                                 ),
                 overview:       $movie['overview'] ?? '',
                 posterPath:     !empty($movie['poster_path'])
-                                    ? "{$imageBaseUrl}{$movie['poster_path']}"
+                                    ? "{$imageBaseUrl}/original/{$movie['poster_path']}"
                                     : null,
                 backdropPath:   !empty($movie['backdrop_path'])
-                                    ? "{$imageBaseUrl}{$movie['backdrop_path']}"
+                                    ? "{$imageBaseUrl}/original/{$movie['backdrop_path']}"
                                     : null,
                 adult:        $movie['adult'] ?? false,
                 releaseDate:    $movie['release_date'] ?? ''
