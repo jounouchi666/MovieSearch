@@ -7,6 +7,7 @@ use App\Application\DTO\MovieSearchResultDTO;
 use App\Application\Repository\MovieSearchRepositoryInterface;
 use App\Infrastructure\ExternalApi\TMDb\Service\MovieGenreCacheService;
 use App\Infrastructure\ExternalApi\TMDb\Service\TMDbMovieSearchMapper;
+use App\Infrastructure\ExternalApi\TMDb\Service\TMDbMovieSearchQueryConverter;
 use App\Infrastructure\ExternalApi\TMDb\Service\TMDbRequestExecutor;
 
 /**
@@ -17,6 +18,7 @@ class MovieSearchRepository implements MovieSearchRepositoryInterface
     public function __construct(
         private TMDbMovieSearchMapper $TMDbMovieSearchMapper,
         private MovieGenreCacheService $movieGenreCacheService,
+        private TMDbMovieSearchQueryConverter $tmdbMovieSearchQueryComvertor,
         private TMDbRequestExecutor $tmdbRequestExecutor
     ) {}
 
@@ -32,10 +34,7 @@ class MovieSearchRepository implements MovieSearchRepositoryInterface
             $this->tmdbRequestExecutor->executeRequest(
                 config('tmdb.search_url'),
                 [
-                    'query' => $query->title,
-                    'include_adult' => $query->includeAdult,
-                    'year' => $query->year,
-                    'page' => $query->page,
+                    ...$this->tmdbMovieSearchQueryComvertor->toCleanArray($query),
                     'language' => config('tmdb.language')
                 ]
             ),
