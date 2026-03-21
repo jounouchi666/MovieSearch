@@ -1,8 +1,19 @@
 import type { MovieResponse } from "../../types/movie";
-import { laravelFetch, SEARCH_URL } from "./laravelClient";
+import LaravelClient from "./LaravelClient";
 
-export const searchMovies = async (title: string, includeAdult: boolean, page: number): Promise<MovieResponse> => {
-    const url = `${SEARCH_URL}?title=${encodeURIComponent(title)}&include_adult=${includeAdult ? 1 : 0}&page=${page}`;
-    console.log(url);
-    return laravelFetch(url);
+type Query = {
+    title: string;
+    includeAdult: boolean;
+    page: number;
+}
+
+const SEARCH_URL = '/api/v1/search';
+
+export const searchMovies = async ({title, includeAdult, page}: Query): Promise<MovieResponse> => {
+    const params = {
+        title,
+        include_adult: includeAdult ? 1 : 0,
+        page
+    };
+    return await LaravelClient.get<MovieResponse>(SEARCH_URL, params);
 }
