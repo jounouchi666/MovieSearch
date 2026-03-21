@@ -1,66 +1,117 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchForm from "../components/SearchForm"
-import type { Movie, Param } from "../types/movie";
+import type { Movie } from "../types/movie";
 import { searchMovies } from "../api/Laravel/movieApi";
 import Loading from "../components/Loading";
 import ErrorMessage from "../components/ErrorMessage";
 import MovieList from "../components/MovieList";
+import { useSearchParams } from "react-router-dom";
+import type { ValidationError } from "../types/validationError";
+import axios from "axios";
 
 export const Search = () => {
-    const [movies, setMovies] = useState<Movie[]|null>(null)
-    const [page, setPage] = useState<number>(0);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const titleInUrl = searchParams.get('title') || '';
+    const includeAdultInUrl = searchParams.get('includeAdult') === 'true';
+    const pageParam = searchParams.get('page');
+    const pageInUrl = pageParam ? parseInt(pageParam, 10) : 1;
+
+    const [title, setTitle] = useState('');
+    const [includeAdult, setIncludeAdult] = useState(false);
+    const [hasSearched, setHasSearched] = useState(false);
+    const [movies, setMovies] = useState<Movie[]>([]);
     const [totalPages, setTotalPages] = useState<number>(0);
     const [totalResults, setTotalResults] = useState<number>(0);
-    const [currentParam, setCurrentParam] = useState<Param>({title: '', includeAdult: false});
+    const [validationErrors, setValidationErrors] = useState<ValidationError['errors']|null>(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState<string|null>(null);
 
-    const onSearch = (title: string, includeAdult: boolean) => {
-        setCurrentParam({title, includeAdult});
-        loadMovies(title, includeAdult, 1);
+    useEffect(() => {
+        setTitle(titleInUrl);
+        setIncludeAdult(includeAdultInUrl);
+    }, [titleInUrl, includeAdultInUrl])
+
+    useEffect(() => {
+        if (!title) return;
+
+        const controller = new AbortController();
+
+        const loadMovies = async () => {
+            try {
+                setValidationErrors(null);
+                setError(null);
+                setLoading(true);
+
+                const data = await searchMovies({
+                    title,
+                    includeAdult,
+                    page: pageInUrl
+                });
+
+                setHasSearched(true);
+                setMovies(data.data.results);
+                setTotalPages(data.data.total_pages);
+                setTotalResults(data.data.total_results);
+            } catch (err: unknown) {
+                if (axios.isAxiosError(err)) {
+                    if (err.response?.status === 422) {
+                        setValidationErrors(err.response.data.errors);
+                        setError('入力内容を確認してください');
+                    } else {
+                        setError('読み込み失敗');
+                    }
+                } else {
+                    setError('予期しないエラー');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadMovies();
+
+        return () => controller.abort();
+    }, [title, includeAdult, pageInUrl]);
+
+    const onSearch = (newTitle: string, newIncludeAdult: boolean) => {
+        setSearchParams({title: newTitle, includeAdult: String(newIncludeAdult), page: '1'})
     };
+    
 
-    const loadMovies = async (title: string, includeAdult: boolean, page: number) => {
-        try {
-            setError('');
-            setLoading(true);
-
-            const data = await searchMovies(title, includeAdult, page);
-
-            setPage(data.page);
-            setMovies(data.results);
-            setTotalPages(data.total_pages);
-            setTotalResults(data.total_results);
-        } catch {
-            setError('読み込み失敗');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const pagination = (page: number) => {
-        loadMovies(currentParam.title, currentParam.includeAdult, page);
+    const pagination = (newPage: number) => {
+        setSearchParams({title, includeAdult: String(includeAdult), page: String(newPage)});
     }
 
     return (
         <div className="w-full max-h-[90vh] md:max-h-[90vh] px-3 py-6 md:max-w-7xl md:w-auto md:p-6 md:shadow-md md:rounded bg-white flex flex-col">
             <h1 className="text-xl md:text-3xl font-bold text-center">Movie Search</h1>
-            <SearchForm onSearch={onSearch} loading={loading} />
+            <SearchForm
+                onSearch={onSearch}
+                titleInUrl={title}
+                includeAdultInUrl={includeAdult}
+                loading={loading}
+                validationErrors={validationErrors}
+            />
 
-            {movies !== null &&
-                <p className="mt-4 text-right">検索結果：{totalResults}件</p>
-            }
+            {error && <ErrorMessage messages={error}/>}
 
             {loading && <Loading />}
-            {error && <ErrorMessage message={error}/>}
 
-            {!loading && !error &&
+            {!loading && !error && !validationErrors && hasSearched &&
+                <p className="mt-4 text-right">検索結果：{totalResults}件</p>
+            }
+            
+            {!loading && !error && !validationErrors && hasSearched && totalResults === 0 &&
+                <p>検索結果がありません</p>
+            }
+
+            {!loading && !error && !validationErrors && hasSearched &&
                 <MovieList
-                count={totalResults}
-                movies={movies}
-                page={page}
-                totalPages={totalPages}
-                onPagination={pagination}
+                    movies={movies}
+                    page={pageInUrl}
+                    totalPages={totalPages}
+                    onPagination={pagination}
                 />
             }
         </div>
