@@ -8,10 +8,12 @@ export type Movie = {
 }
 
 export type MovieResponse = {
-    page: number;
-    results: Movie[];
-    total_pages: number;
-    total_results: number;
+    data: {
+        page: number;
+        results: Movie[];
+        total_pages: number;
+        total_results: number;
+    }
 }
 
 export type Param = {
