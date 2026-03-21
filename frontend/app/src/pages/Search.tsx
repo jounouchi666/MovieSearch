@@ -8,6 +8,7 @@ import MovieList from "../components/MovieList";
 import { useSearchParams } from "react-router-dom";
 import type { ValidationError } from "../types/validationError";
 import axios from "axios";
+import Pagination from "../components/Pagination";
 
 export const Search = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -106,14 +107,14 @@ export const Search = () => {
                 <p>検索結果がありません</p>
             }
 
-            {!loading && !error && !validationErrors && hasSearched &&
-                <MovieList
-                    movies={movies}
-                    page={pageInUrl}
-                    totalPages={totalPages}
-                    onPagination={pagination}
-                />
-            }
+            {!loading && !error && !validationErrors && hasSearched && totalResults > 0 &&
+                <>
+                    <MovieList movies={movies} />
+                    <div className="flex justify-center">
+                        <Pagination page={pageInUrl} totalPages={totalPages} onPagination={pagination} />
+                    </div>
+                </>
+            }           
         </div>
     );
 }
