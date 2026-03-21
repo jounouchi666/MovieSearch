@@ -1,22 +1,38 @@
-// URL
-export const BASE_URL = 'http://localhost:80';
-export const SEARCH_URL = BASE_URL + '/api/v1/search';
+import axios, { type AxiosInstance } from "axios";
 
-const options = {
-    method: 'GET',
-    headers: {
+const BASE_URL = import.meta.env.VITE_LARAVEL_API_URL;
+
+class LaravelClient
+{
+    private static instance: LaravelClient
+    private axiosInstance: AxiosInstance;
+
+    private readonly HEADERS = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-API-Version': '1.0'
-    }
-};
+    };
 
-export const laravelFetch = async <T>(url:string): Promise<T> => {
-    const res = await fetch(url, options);
-    if (!res.ok) {
-        throw new Error('Failed to fetch movies');
+    constructor () {
+        this.axiosInstance = axios.create({
+            baseURL: BASE_URL,
+            headers: this.HEADERS
+        })
     }
 
-    const data = await res.json();
-    return data.data;
+    public static getInstance(): LaravelClient
+    {
+        if (!LaravelClient.instance) {
+            LaravelClient.instance = new LaravelClient();
+        }
+        return LaravelClient.instance;
+    }
+
+    public async get<T>(url: string, params?: Record<string, unknown>): Promise<T>
+    {
+        const res = await this.axiosInstance.get<T>(url, {params});
+        return res.data;
+    }
 }
+
+export default LaravelClient.getInstance();
