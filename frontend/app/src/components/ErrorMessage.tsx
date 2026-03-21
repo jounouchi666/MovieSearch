@@ -1,10 +1,16 @@
 type Props = {
-    message: string
+    messages: string|string[]
 }
 
-const ErrorMessage = ({ message }: Props) => 
-    <div className="mt-6">
-        <p className="text-red-500">{message}</p>
-    </div>;
+const ErrorMessage = ({ messages }: Props) => {
+    messages = Array.isArray(messages) ? messages : [messages];
+    return (
+        <div>
+            {messages.map(message => 
+                <p key={message} className="text-red-500">{message}</p>
+            )}
+        </div>
+    );
+};
 
 export default ErrorMessage;
