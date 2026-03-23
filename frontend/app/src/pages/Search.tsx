@@ -47,7 +47,8 @@ export const Search = () => {
                 const data = await searchMovies({
                     title,
                     includeAdult,
-                    page: pageInUrl
+                    page: pageInUrl,
+                    signal: controller.signal
                 });
 
                 setHasSearched(true);
