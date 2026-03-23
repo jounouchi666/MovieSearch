@@ -18,8 +18,6 @@ class SetApiHeaders
         $response = $next($request);
 
         return $response->withHeaders([
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
             'X-API-Version' => '1.0'
         ]);
     }
