@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Exception;
+namespace App\Infrastructure\ExternalApi\TMDb\Exception;
 
 use RuntimeException;
 use Throwable;
