@@ -28,9 +28,13 @@ class LaravelClient
         return LaravelClient.instance;
     }
 
-    public async get<T>(url: string, params?: Record<string, unknown>): Promise<T>
+    public async get<T>(
+        url: string,
+        params?: Record<string, unknown>,
+        signal?: AbortSignal
+    ): Promise<T>
     {
-        const res = await this.axiosInstance.get<T>(url, {params});
+        const res = await this.axiosInstance.get<T>(url, {params, signal});
         return res.data;
     }
 }
