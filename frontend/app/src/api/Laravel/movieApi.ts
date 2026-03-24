@@ -16,5 +16,6 @@ export const searchMovies = async ({title, includeAdult, page, signal}: Query): 
         include_adult: includeAdult,
         page
     };
-    return await LaravelClient.get<MovieResponse>(SEARCH_URL, params, signal);
+    const client = LaravelClient.getInstance();
+    return await client.get<MovieResponse>(SEARCH_URL, params, signal);
 }

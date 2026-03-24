@@ -39,4 +39,4 @@ class LaravelClient
     }
 }
 
-export default LaravelClient.getInstance();
+export default LaravelClient;
