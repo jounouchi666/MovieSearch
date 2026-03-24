@@ -2,8 +2,8 @@
 
 namespace App\Infrastructure\ExternalApi\TMDb\Service;
 
-use App\Infrastructure\Exception\TMDbApiException;
 use App\Infrastructure\ExternalApi\Interface\HttpClientInterface;
+use App\Infrastructure\ExternalApi\TMDb\Exception\TMDbApiException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Log;
 
