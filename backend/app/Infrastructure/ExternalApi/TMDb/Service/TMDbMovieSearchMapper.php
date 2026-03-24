@@ -16,7 +16,7 @@ class TMDbMovieSearchMapper
                 id:             $movie['id'] ?? '',
                 title:          $movie['title'] ?? '',
                 originalTitle:  $movie['original_title'] ?? '',
-                genre:         array_map(fn($genreId) => new MovieGenreResultDTO(
+                genre:          array_map(fn($genreId) => new MovieGenreResultDTO(
                                         id:     $genreId,
                                         name:   $genreMap[$genreId] ?? ''
                                     ),
@@ -29,7 +29,7 @@ class TMDbMovieSearchMapper
                 backdropPath:   !empty($movie['backdrop_path'])
                                     ? "{$imageBaseUrl}/original/{$movie['backdrop_path']}"
                                     : null,
-                adult:        $movie['adult'] ?? false,
+                adult:          $movie['adult'] ?? false,
                 releaseDate:    $movie['release_date'] ?? ''
         ), $response['results'] ?? []);
         
