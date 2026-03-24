@@ -18,7 +18,7 @@ class MovieSearchRepository implements MovieSearchRepositoryInterface
     public function __construct(
         private TMDbMovieSearchMapper $TMDbMovieSearchMapper,
         private MovieGenreCacheService $movieGenreCacheService,
-        private TMDbMovieSearchQueryConverter $tmdbMovieSearchQueryComvertor,
+        private TMDbMovieSearchQueryConverter $tmdbMovieSearchQueryComverter,
         private TMDbRequestExecutor $tmdbRequestExecutor
     ) {}
 
@@ -34,7 +34,7 @@ class MovieSearchRepository implements MovieSearchRepositoryInterface
             $this->tmdbRequestExecutor->executeRequest(
                 config('tmdb.search_url'),
                 [
-                    ...$this->tmdbMovieSearchQueryComvertor->toCleanArray($query),
+                    ...$this->tmdbMovieSearchQueryComverter->toCleanArray($query),
                     'language' => config('tmdb.language')
                 ]
             ),
