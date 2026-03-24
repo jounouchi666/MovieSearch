@@ -36,17 +36,27 @@ class MovieSearchRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => '必須項目です。',
-            'title.string'   => '入力値が不正です。',
-            'title.max'      => ':max文字以内で入力してください。',
+            'title.required'        => '必須項目です。',
+            'title.string'          => '入力値が不正です。',
+            'title.max'             => ':max文字以内で入力してください。',
             
-            'include_adult'  => '入力値が不正です。',
+            'include_adult.boolean' => '入力値が不正です。',
 
-            'year.numeric'   => '入力値が不正です。',
-            'year.digits'    => '西暦4桁で入力してください。',
-            'year.min'       => ':min年以降の年を入力してください。',
-            'year.max'       => ':max年までの年を入力してください。'
+            'year.numeric'          => '入力値が不正です。',
+            'year.digits'           => '西暦4桁で入力してください。',
+            'year.min'              => ':min年以降の年を入力してください。',
+            'year.max'              => ':max年までの年を入力してください。'
         ];
+    }
+
+    public function prepareForValidation(): void
+    {
+        // 真偽値相当の文字列をbool値に変換
+        if ($this->has('include_adult')) {
+            $this->merge([
+                'include_adult' => filter_var($this->include_adult, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
+            ]);
+        }
     }
 
     public function buildQuery(): MovieSearchQuery
