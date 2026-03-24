@@ -13,7 +13,7 @@ const SEARCH_URL = '/api/v1/search';
 export const searchMovies = async ({title, includeAdult, page, signal}: Query): Promise<MovieResponse> => {
     const params = {
         title,
-        include_adult: includeAdult ? 1 : 0,
+        include_adult: includeAdult,
         page
     };
     return await LaravelClient.get<MovieResponse>(SEARCH_URL, params, signal);
