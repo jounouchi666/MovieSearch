@@ -3,7 +3,8 @@
 namespace Tests\Unit;
 
 use App\Infrastructure\ExternalApi\TMDb\Service\TMDbMovieSearchMapper;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Facades\Config;
+use Tests\TestCase;
 
 class TMDbMovieSearchMapperTest extends TestCase
 {
@@ -12,7 +13,7 @@ class TMDbMovieSearchMapperTest extends TestCase
      */
     public function test_APIレスポンスがDTOに変換される(): void
     {
-        config(['tmdb.image_base_url' => 'https://img.test']);
+        Config::set('tmdb.image_base_url', 'https://img.test');
 
         $mapper = new TMDbMovieSearchMapper();
 
@@ -36,7 +37,7 @@ class TMDbMovieSearchMapperTest extends TestCase
 
         $this->assertEquals('test', $dto->results[0]->title);
         $this->assertEquals('action', $dto->results[0]->genre[0]->name);
-        $this->assertStringContainsString('/abc.jpg', $dto->results[0]->poster_path);
+        $this->assertStringContainsString('/abc.jpg', $dto->results[0]->posterPath);
     }
 
     /**
@@ -44,6 +45,8 @@ class TMDbMovieSearchMapperTest extends TestCase
      */
     public function test_レスポンスにキーがなくても落ちない(): void
     {
+        Config::set('tmdb.image_base_url', 'https://img.test');
+
         $mapper = new TMDbMovieSearchMapper();
 
         $dto = $mapper->toDTO([], []);
