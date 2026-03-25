@@ -54,7 +54,7 @@ class MovieSearchRequest extends FormRequest
         // 真偽値相当の文字列をbool値に変換
         if ($this->has('include_adult')) {
             $this->merge([
-                'include_adult' => filter_var($this->include_adult, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
+                'include_adult' => filter_var($this->include_adult, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE)
             ]);
         }
     }
