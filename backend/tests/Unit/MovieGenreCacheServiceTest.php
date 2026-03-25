@@ -6,7 +6,7 @@ use App\Application\Repository\MovieGenreRepositoryInterface;
 use App\Infrastructure\ExternalApi\TMDb\Service\MovieGenreCacheService;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class MovieGenreCacheServiceTest extends TestCase
 {
@@ -15,16 +15,16 @@ class MovieGenreCacheServiceTest extends TestCase
      */
     public function test_キャッシュされる(): void
     {
-        Cache::shouldReceive('remember')
+        Cache::spy();
+
+        $repo = Mockery::mock(MovieGenreRepositoryInterface::class);
+        $repo->shouldReceive('getGenre')
             ->once()
             ->andReturn([28 => 'action']);
 
-        $repo = Mockery::mock(MovieGenreRepositoryInterface::class);
-
         $service = new MovieGenreCacheService($repo);
 
-        $result = $service->getGenreMap();
-
-        $this->assertEquals([28 => 'action'], $result);
+        $service->getGenreMap();
+        $service->getGenreMap(); // 2回目は呼ばれないことを確認
     }
 }
