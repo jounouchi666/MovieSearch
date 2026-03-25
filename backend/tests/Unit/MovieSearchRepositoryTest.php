@@ -11,7 +11,7 @@ use App\Infrastructure\ExternalApi\TMDb\Service\TMDbMovieSearchQueryConverter;
 use App\Infrastructure\ExternalApi\TMDb\Service\TMDbRequestExecutor;
 use Illuminate\Support\Facades\Config;
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class MovieSearchRepositoryTest extends TestCase
 {
