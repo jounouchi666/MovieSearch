@@ -14,7 +14,7 @@ class MovieSearchRequestTest extends TestCase
      */
     public function test_最小パラメータでOK(): void
     {
-        $response = $this->getJson("/api/search?title=test");
+        $response = $this->getJson("/api/v1/search?title=test");
 
         $this->assertSuccessResponse($response);
     }
@@ -24,7 +24,7 @@ class MovieSearchRequestTest extends TestCase
      */
     public function test_titleが空でNG(): void
     {
-        $response = $this->getJson('/api/search');
+        $response = $this->getJson('/api/v1/search');
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['title']);
@@ -34,7 +34,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $title = str_repeat('a', 255);
 
-        $response = $this->getJson("/api/search?title={$title}");
+        $response = $this->getJson("/api/v1/search?title={$title}");
 
         $this->assertSuccessResponse($response);
     }
@@ -43,7 +43,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $title = str_repeat('a', 256);
 
-        $response = $this->getJson("/api/search?title={$title}");
+        $response = $this->getJson("/api/v1/search?title={$title}");
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['title']);
@@ -56,20 +56,20 @@ class MovieSearchRequestTest extends TestCase
     {
         $includeAdult = true;
 
-        $response = $this->getJson("/api/search?title=test&include_adult={$includeAdult}");
+        $response = $this->getJson("/api/v1/search?title=test&include_adult={$includeAdult}");
 
         $response->assertOk()
             ->assertJson(fn ($json) => $json->has('data')->etc());
     }
 
-    public function test_include_adultが不正な値（文字列）でNG(): void
+    public function test_include_adultが不正な値（文字列）は強制的にnullでOK(): void
     {
         $includeAdult = 'ofCourse';
 
-        $response = $this->getJson("/api/search?title=test&include_adult={$includeAdult}");
+        $response = $this->getJson("/api/v1/search?title=test&include_adult={$includeAdult}");
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['include_adult']);
+        $response->assertOk()
+            ->assertJson(fn ($json) => $json->has('data')->etc());
     }
 
     /**
@@ -80,7 +80,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $year = 'h30';
 
-        $response = $this->getJson("/api/search?title=test&year={$year}");
+        $response = $this->getJson("/api/v1/search?title=test&year={$year}");
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['year']);
@@ -90,7 +90,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $year = 190;
 
-        $response = $this->getJson("/api/search?title=test&year={$year}");
+        $response = $this->getJson("/api/v1/search?title=test&year={$year}");
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['year']);
@@ -100,7 +100,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $year = 1900;
 
-        $response = $this->getJson("/api/search?title=test&year={$year}");
+        $response = $this->getJson("/api/v1/search?title=test&year={$year}");
 
         $response->assertOk()
             ->assertJson(fn ($json) => $json->has('data')->etc());
@@ -110,7 +110,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $year = 1899;
 
-        $response = $this->getJson("/api/search?title=test&year={$year}");
+        $response = $this->getJson("/api/v1/search?title=test&year={$year}");
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['year']);
@@ -120,7 +120,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $year = date('Y') + 5;
 
-        $response = $this->getJson("/api/search?title=test&year={$year}");
+        $response = $this->getJson("/api/v1/search?title=test&year={$year}");
 
         $response->assertOk()
             ->assertJson(fn ($json) => $json->has('data')->etc());
@@ -130,7 +130,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $year = date('Y') + 6;
 
-        $response = $this->getJson("/api/search?title=test&year={$year}");
+        $response = $this->getJson("/api/v1/search?title=test&year={$year}");
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['year']);
@@ -143,7 +143,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $page = 1;
 
-        $response = $this->getJson("/api/search?title=test&page={$page}");
+        $response = $this->getJson("/api/v1/search?title=test&page={$page}");
 
         $response->assertOk()
             ->assertJson(fn ($json) => $json->has('data')->etc());
@@ -153,7 +153,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $page = 0;
 
-        $response = $this->getJson("/api/search?title=test&page={$page}");
+        $response = $this->getJson("/api/v1/search?title=test&page={$page}");
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['page']);
@@ -163,7 +163,7 @@ class MovieSearchRequestTest extends TestCase
     {
         $page = 'first';
 
-        $response = $this->getJson("/api/search?title=test&page={$page}");
+        $response = $this->getJson("/api/v1/search?title=test&page={$page}");
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['page']);
