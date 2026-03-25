@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Application\DTO\MovieSearchResultDTO;
+use App\Application\UseCase\MovieSearchUseCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\TestResponse;
+use Mockery;
 use Tests\TestCase;
 
 class MovieSearchRequestTest extends TestCase
@@ -14,6 +17,11 @@ class MovieSearchRequestTest extends TestCase
      */
     public function test_最小パラメータでOK(): void
     {
+        $this->useCaseMock(
+            MovieSearchUseCase::class,
+            new MovieSearchResultDTO(1, [], 1, 1)
+        );
+
         $response = $this->getJson("/api/v1/search?title=test");
 
         $this->assertSuccessResponse($response);
@@ -32,6 +40,11 @@ class MovieSearchRequestTest extends TestCase
 
     public function test_titleが255文字でOK(): void
     {
+        $this->useCaseMock(
+            MovieSearchUseCase::class,
+            new MovieSearchResultDTO(1, [], 1, 1)
+        );
+
         $title = str_repeat('a', 255);
 
         $response = $this->getJson("/api/v1/search?title={$title}");
@@ -54,6 +67,11 @@ class MovieSearchRequestTest extends TestCase
      */
     public function test_include_adultがtrueでOK(): void
     {
+        $this->useCaseMock(
+            MovieSearchUseCase::class,
+            new MovieSearchResultDTO(1, [], 1, 1)
+        );
+
         $includeAdult = true;
 
         $response = $this->getJson("/api/v1/search?title=test&include_adult={$includeAdult}");
@@ -64,6 +82,11 @@ class MovieSearchRequestTest extends TestCase
 
     public function test_include_adultが不正な値（文字列）は強制的にnullでOK(): void
     {
+        $this->useCaseMock(
+            MovieSearchUseCase::class,
+            new MovieSearchResultDTO(1, [], 1, 1)
+        );
+
         $includeAdult = 'ofCourse';
 
         $response = $this->getJson("/api/v1/search?title=test&include_adult={$includeAdult}");
@@ -98,6 +121,11 @@ class MovieSearchRequestTest extends TestCase
 
     public function test_yearが最小値でOK(): void
     {
+        $this->useCaseMock(
+            MovieSearchUseCase::class,
+            new MovieSearchResultDTO(1, [], 1, 1)
+        );
+
         $year = 1900;
 
         $response = $this->getJson("/api/v1/search?title=test&year={$year}");
@@ -118,6 +146,11 @@ class MovieSearchRequestTest extends TestCase
 
     public function test_yearが最大値でOK(): void
     {
+        $this->useCaseMock(
+            MovieSearchUseCase::class,
+            new MovieSearchResultDTO(1, [], 1, 1)
+        );
+
         $year = date('Y') + 5;
 
         $response = $this->getJson("/api/v1/search?title=test&year={$year}");
@@ -141,6 +174,11 @@ class MovieSearchRequestTest extends TestCase
      */
     public function test_pageが最小値でOK(): void
     {
+        $this->useCaseMock(
+            MovieSearchUseCase::class,
+            new MovieSearchResultDTO(1, [], 1, 1)
+        );
+
         $page = 1;
 
         $response = $this->getJson("/api/v1/search?title=test&page={$page}");
@@ -169,6 +207,22 @@ class MovieSearchRequestTest extends TestCase
             ->assertJsonValidationErrors(['page']);
     }
 
+    /**
+     * UseCaseのモック
+     *
+     * @param  string $useCase UseCaseの完全修飾名
+     * @param  mixed $return
+     * @return void
+     */
+    private function useCaseMock(string $useCase, mixed $return): void
+    {
+        $mock = Mockery::mock($useCase);
+        $mock->shouldReceive('execute')
+            ->zeroOrMoreTimes()
+            ->andReturn($return);
+
+        $this->app->instance($useCase, $mock);
+    }
         
     /**
      * 成功レスポンス
