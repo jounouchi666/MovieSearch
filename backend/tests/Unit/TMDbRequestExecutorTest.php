@@ -7,7 +7,7 @@ use App\Infrastructure\ExternalApi\TMDb\Exception\TMDbApiException;
 use App\Infrastructure\ExternalApi\TMDb\Service\TMDbRequestExecutor;
 use Illuminate\Http\Client\RequestException;
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class TMDbRequestExecutorTest extends TestCase
 {
