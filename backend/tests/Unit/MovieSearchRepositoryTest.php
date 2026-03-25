@@ -9,6 +9,7 @@ use App\Infrastructure\ExternalApi\TMDb\Service\MovieGenreCacheService;
 use App\Infrastructure\ExternalApi\TMDb\Service\TMDbMovieSearchMapper;
 use App\Infrastructure\ExternalApi\TMDb\Service\TMDbMovieSearchQueryConverter;
 use App\Infrastructure\ExternalApi\TMDb\Service\TMDbRequestExecutor;
+use Illuminate\Support\Facades\Config;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -19,6 +20,8 @@ class MovieSearchRepositoryTest extends TestCase
      */
     public function test_各サービスを組み合わせてDTOを返す(): void
     {
+        Config::set('tmdb.search_url', 'https://test/search');
+
         $query = new MovieSearchQuery('test', true, null, 1);
 
         $converter = Mockery::mock(TMDbMovieSearchQueryConverter::class);
